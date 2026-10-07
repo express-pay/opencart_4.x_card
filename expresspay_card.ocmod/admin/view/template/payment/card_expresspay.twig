@@ -1,0 +1,186 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="float-end">
+        <button type="submit" form="form-payment" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+        <a href="{{ back }}" data-bs-toggle="tooltip" title="{{ button_back }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header"><i class="fa-solid fa-pencil"></i> {{ text_edit }} V {{ version_extension }}</div>
+      <div class="card-body">
+        <form id="form-payment" action="{{ save }}" method="post" data-oc-toggle="ajax">
+          <!-- Название метода оплаты -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-name-payment-method"><span data-bs-toggle="tooltip" title="{{ namePaymentMethodTooltip }}">{{ namePaymentMethodLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_name_payment_method" value="{{ payment_card_expresspay_name_payment_method }}" placeholder="{{ namePaymentMethodLabel }}" id="input-name-payment-method" class="form-control"/>
+              <div id="error-name-payment-method" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Использовать тестовый режим -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ useTestModeLabel }}</label>
+            <div class="col-sm-10">
+              <div class="form-check form-switch form-switch-lg">
+                <input type="hidden" name="payment_card_expresspay_is_test_mode" value="0"/>
+                <input type="checkbox" name="payment_card_expresspay_is_test_mode" value="1" id="input-test-mode" class="form-check-input"{% if payment_card_expresspay_is_test_mode %} checked{% endif %}/>
+              </div>
+            </div>
+          </div>
+          <!-- ТОКЕН -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-token"><span data-bs-toggle="tooltip" title="{{ tokenTooltip }}">{{ tokenLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_token" value="{{ payment_card_expresspay_token }}" placeholder="{{ tokenLabel }}" id="input-token" class="form-control"/>
+              <div id="error-token" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Номер услуги -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-service-id"><span data-bs-toggle="tooltip" title="{{ serviceIdTooltip }}">{{ serviceIdLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_service_id" value="{{ payment_card_expresspay_service_id }}" placeholder="{{ serviceIdLabel }}" id="input-service-id" class="form-control"/>
+              <div id="error-service-id" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Секретное слово -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-secret-word"><span data-bs-toggle="tooltip" title="{{ secretWordTooltip }}">{{ secretWordLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_secret_word" value="{{ payment_card_expresspay_secret_word }}" placeholder="{{ secretWordLabel }}" id="input-secret-word" class="form-control"/>
+            </div>
+          </div>
+          <!-- Использовать цифровую подпись для уведомлений -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ useSignatureForNotificationLabel }}</label>
+            <div class="col-sm-10">
+              <div class="form-check form-switch form-switch-lg">
+                <input type="hidden" name="payment_card_expresspay_is_use_signature_for_notification" value="0"/>
+                <input type="checkbox" name="payment_card_expresspay_is_use_signature_for_notification" value="1" id="input-use-signature" class="form-check-input"{% if payment_card_expresspay_is_use_signature_for_notification %} checked{% endif %}/>
+              </div>
+            </div>
+          </div>
+          <!-- Секретное слово для уведомлений -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-secret-word-notification"><span data-bs-toggle="tooltip" title="{{ secretWordNotificationTooltip }}">{{ secretWordNotificationLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_secret_word_for_notification" value="{{ payment_card_expresspay_secret_word_for_notification }}" placeholder="{{ secretWordNotificationLabel }}" id="input-secret-word-notification" class="form-control"/>
+            </div>
+          </div>
+          <!-- Адрес для уведомлений -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-url-notification"><span data-bs-toggle="tooltip" title="{{ urlForNotificationTooltip }}">{{ urlForNotificationLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_url_notification" value="{{ payment_card_expresspay_url_notification }}" readonly placeholder="{{ urlForNotificationLabel }}" id="input-url-notification" class="form-control"/>
+            </div>
+          </div>
+          <!-- Адрес API -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-api-url"><span data-bs-toggle="tooltip" title="{{ urlApiTooltip }}">{{ urlApiLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_api_url" value="{{ payment_card_expresspay_api_url }}" placeholder="{{ urlApiLabel }}" id="input-api-url" class="form-control"/>
+              <div id="error-api-url" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Адрес тестового API -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-sandbox-url"><span data-bs-toggle="tooltip" title="{{ urlSandboxTooltip }}">{{ urlSandboxLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_sandbox_url" value="{{ payment_card_expresspay_sandbox_url }}" placeholder="{{ urlSandboxLabel }}" id="input-sandbox-url" class="form-control"/>
+              <div id="error-sandbox-url" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Информация о платеже -->
+          <div class="row mb-3 required">
+            <label class="col-sm-2 col-form-label" for="input-info"><span data-bs-toggle="tooltip" title="{{ infoTooltip }}">{{ infoLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_info" value="{{ payment_card_expresspay_info }}" placeholder="{{ infoLabel }}" id="input-info" class="form-control"/>
+              <div id="error-info" class="invalid-feedback"></div>
+            </div>
+          </div>
+          <!-- Сообщение при успешном создании счёта -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-message-success"><span data-bs-toggle="tooltip" title="{{ messageSuccessTooltip }}">{{ messageSuccessLabel }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_message_success" value="{{ payment_card_expresspay_message_success }}" placeholder="{{ messageSuccessLabel }}" id="input-message-success" class="form-control"/>
+            </div>
+          </div>
+          <!-- Статус -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ entryStatus }}</label>
+            <div class="col-sm-10">
+              <div class="form-check form-switch form-switch-lg">
+                <input type="hidden" name="payment_card_expresspay_status" value="0"/>
+                <input type="checkbox" name="payment_card_expresspay_status" value="1" id="input-status" class="form-check-input"{% if payment_card_expresspay_status %} checked{% endif %}/>
+              </div>
+            </div>
+          </div>
+          <!-- Порядок сортировки -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-sort-order">{{ entrySortOrder }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_card_expresspay_sort_order" value="{{ payment_card_expresspay_sort_order }}" placeholder="{{ entrySortOrder }}" id="input-sort-order" class="form-control"/>
+            </div>
+          </div>
+          <!-- Статус нового заказа -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-processed-status"><span data-bs-toggle="tooltip" title="{{ processedOrderStatusTooltip }}">{{ processedOrderStatusLabel }}</span></label>
+            <div class="col-sm-10">
+              <select name="payment_card_expresspay_processed_status_id" id="input-processed-status" class="form-select">
+                {% for order_status in order_statuses %}
+                  <option value="{{ order_status.order_status_id }}"{% if order_status.order_status_id == payment_card_expresspay_processed_status_id %} selected{% endif %}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <!-- Статус оплаченного заказа -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-success-status"><span data-bs-toggle="tooltip" title="{{ successOrderStatusTooltip }}">{{ successOrderStatusLabel }}</span></label>
+            <div class="col-sm-10">
+              <select name="payment_card_expresspay_success_status_id" id="input-success-status" class="form-select">
+                {% for order_status in order_statuses %}
+                  <option value="{{ order_status.order_status_id }}"{% if order_status.order_status_id == payment_card_expresspay_success_status_id %} selected{% endif %}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <!-- Статус ошибки при заказе -->
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="input-fail-status"><span data-bs-toggle="tooltip" title="{{ failOrderStatusTooltip }}">{{ failOrderStatusLabel }}</span></label>
+            <div class="col-sm-10">
+              <select name="payment_card_expresspay_fail_status_id" id="input-fail-status" class="form-select">
+                {% for order_status in order_statuses %}
+                  <option value="{{ order_status.order_status_id }}"{% if order_status.order_status_id == payment_card_expresspay_fail_status_id %} selected{% endif %}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#input-test-mode').on('change', function() {
+    if ($(this).is(':checked')) {
+        $('#input-token').val('a75b74cbcfe446509e8ee874f421bd68');
+        $('#input-service-id').val('6');
+        $('#input-secret-word').val('sandbox.expresspay.by');
+    } else {
+        $('#input-token').val('');
+        $('#input-service-id').val('');
+        $('#input-secret-word').val('');
+    }
+});
+//--></script>
+{{ footer }}

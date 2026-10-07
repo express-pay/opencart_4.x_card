@@ -1,0 +1,14 @@
+{{ header }}
+<div id="content">
+    <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+            <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+    </ul>
+    <h2>{{ heading_title }}</h2>
+    <p>{{ text_message }}</p>
+    <div class="buttons">
+        <div class="text-end"><a id="button-confirm" class="btn btn-primary" href="{{ continue }}">{{ button_continue }}</a></div>
+    </div>
+</div>
+{{ footer }}
