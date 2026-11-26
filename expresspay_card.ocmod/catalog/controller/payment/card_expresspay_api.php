@@ -48,14 +48,37 @@ class CardExpresspayApi extends \Opencart\System\Engine\Controller {
 			return;
 		}
 
-		$accountNo = $data['AccountNo'];
-		if (isset($accountNo)) {
+		if (!is_array($data) || !isset($data['AccountNo'])) {
+			header('HTTP/1.1 400 Bad Request');
+			echo 'FAILED | The notice is not processed';
+			$this->model_extension_expresspay_card_payment_card_expresspay_log->log_error("notify_success", "The notice is not processed");
+			return;
+		}
+
+		$accountNo = (int)$data['AccountNo'];
+
+		if ($accountNo > 0) {
 			$this->load->model('checkout/order');
+			$order_info = $this->model_checkout_order->getOrder($accountNo);
+
+			if (!$order_info) {
+				header('HTTP/1.1 400 Bad Request');
+				echo 'FAILED | order not found';
+				$this->model_extension_expresspay_card_payment_card_expresspay_log->log_error("notify_success", "Order not found; AccountNo - " . $accountNo);
+				return;
+			}
+
 			$cmdtype = $data['CmdType'];
-			$status = $data['Status'];
+			$status = $data['Status'] ?? null;
 
 			switch ($cmdtype) {
 				case 1:
+					$paidStatusId = (int)$this->config->get(self::SUCCESS_STATUS_ID_PARAM_NAME);
+
+					if ($paidStatusId > 0 && (int)$order_info['order_status_id'] !== $paidStatusId) {
+						$this->model_checkout_order->addHistory($accountNo, $paidStatusId);
+					}
+
 					header("HTTP/1.1 200 OK");
 					echo 'OK | the notice is processed';
 					$this->model_extension_expresspay_card_payment_card_expresspay_log->log_info("notify_success", "the notice is processed");

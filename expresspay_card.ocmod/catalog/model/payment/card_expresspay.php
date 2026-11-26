@@ -61,11 +61,8 @@ class CardExpresspay extends \Opencart\System\Engine\Model {
 			return $data;
 		}
 
-		$amount = str_replace('.', ',', $this->currency->format($order_info['total'], $this->session->data['currency'], 0, false));
-		if ($this->session->data['currency'] !== "BYN") {
-			$response = $this->getCurrencyRateFromNBRB($this->session->data['currency']);
-			$amount = str_replace('.', ',', round($amount * $response->Cur_OfficialRate, 2));
-		}
+		$amountValue = $this->currency->convert((float)$order_info['total'], (string)$this->config->get('config_currency'), 'BYN');
+		$amount = number_format($amountValue, 2, ',', '');
 
 		$token = $config->get('payment_card_expresspay_token');
 		$serviceId = $config->get('payment_card_expresspay_service_id');
@@ -75,6 +72,8 @@ class CardExpresspay extends \Opencart\System\Engine\Model {
 		$sandboxUrl = $config->get('payment_card_expresspay_sandbox_url');
 		$isTestMode = $config->get('payment_card_expresspay_is_test_mode');
 
+		$returnQuery = 'order_id=' . (int)$orderId . '&token=' . hash_hmac('sha1', (string)(int)$orderId, (string)$secretWord);
+
 		$signatureParams['Token'] = $token;
 		$signatureParams['ServiceId'] = $serviceId;
 		$signatureParams['AccountNo'] = $orderId;
@@ -82,8 +81,8 @@ class CardExpresspay extends \Opencart\System\Engine\Model {
 		$signatureParams['Currency'] = self::CURRENCY;
 		$signatureParams['Info'] = str_replace('##order_id##', $orderId, $info);
 		$signatureParams['ReturnType'] = self::RETURN_TYPE;
-		$signatureParams['ReturnUrl'] = $this->url->link('extension/expresspay_card/payment/card_expresspay.success');
-		$signatureParams['FailUrl'] = $this->url->link('extension/expresspay_card/payment/card_expresspay.fail');
+		$signatureParams['ReturnUrl'] = str_replace('&amp;', '&', $this->url->link('extension/expresspay_card/payment/card_expresspay.success', $returnQuery));
+		$signatureParams['FailUrl'] = str_replace('&amp;', '&', $this->url->link('extension/expresspay_card/payment/card_expresspay.fail', $returnQuery));
 		$signatureParams["ReturnInvoiceUrl"] = "1";
 
 		$data['Signature'] = self::computeSignature($signatureParams, $secretWord, 'add-webcard-invoice');
@@ -97,10 +96,6 @@ class CardExpresspay extends \Opencart\System\Engine\Model {
 		}
 
 		return $data;
-	}
-
-	private function getCurrencyRateFromNBRB($currency) {
-		return json_decode(file_get_contents("https://www.nbrb.by/api/exrates/rates/$currency?parammode=2"));
 	}
 
 	private static function computeSignature($signatureParams, $secretWord, $method) {
